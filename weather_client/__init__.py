@@ -1,2 +1,2 @@
-from weather_client.weather_client import WeatherAPIClient
-from weather_client.weather_service import WeatherService
+from .weather_client import WeatherAPIClient
+from .weather_service import WeatherService
