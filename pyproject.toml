@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setup]
+name = "weather_client"
+version = "0.1.0"
+description = ""
+author = "Ihor Prokopenko"
+author_email = "i.prokopenko@gmail.com"
+license = "MIT"
+keywords = []
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+]
+
+[build-system.requires]
+python = ">=3.11"
