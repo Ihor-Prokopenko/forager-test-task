@@ -66,8 +66,7 @@ Private methods:
 
 ## Example using WeatherService
 ```python
-from weather_client import WeatherAPIClient
-from weather_client import WeatherService
+from weather_client import WeatherAPIClient, WeatherService
 
 api_key = "your_weather_api_key"
 # Creating an instance of the WeatherAPIClient class
