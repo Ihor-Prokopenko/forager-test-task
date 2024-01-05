@@ -9,20 +9,36 @@ class WeatherAPIException(Exception):
     pass
 
 
-class WeatherAPIClient(object):
-    def __init__(self, api_key, base_url=BASE_URL, api_path=WEATHER_API_PATH):
+class WeatherAPIClient:
+    """
+    Client for interacting with the Weather API.
+
+    Attributes:
+        api_key (str): The API key for accessing the Weather API.
+    """
+    def __init__(self, api_key):
         self.api_key = api_key
-        self.base_url = base_url
-        self.api_path = api_path
+        self.base_url = BASE_URL
+        self.api_path = WEATHER_API_PATH
         self._validate_api()
 
     def _validate_api(self):
+        """Validate the connection to the Weather API."""
         response = requests.get(self.base_url)
         if not response.status_code == 200:
             raise WeatherAPIException(f"Failed to connect to Weather API. "
                                       f"Status code: {response.status_code}")
 
     def _build_url(self, city_name: str = None) -> str:
+        """
+        Build the full URL for the Weather API request.
+
+        Args:
+            city_name (str, optional): The name of the city for which to retrieve weather data.
+
+        Returns:
+            str: The full URL for the Weather API request.
+        """
         full_url = urljoin(self.base_url, self.api_path)
 
         params = {"key": self.api_key}
@@ -34,6 +50,15 @@ class WeatherAPIClient(object):
 
     @staticmethod
     def _format_weather_data(data: dict) -> dict:
+        """
+        Format raw weather data from the API response.
+
+        Args:
+            data (dict): Raw weather data from the API response.
+
+        Returns:
+            dict: Formatted weather data.
+        """
         formatted_data = {
             data.get("location", {}).get("name"): {
                 "temperature": data.get("current", {}).get("temp_f"),
@@ -43,7 +68,16 @@ class WeatherAPIClient(object):
         }
         return formatted_data
 
-    def get_current_weather(self, city_name: str = None):
+    def get_current_weather(self, city_name: str) -> dict:
+        """
+        Get the current weather for a specific city from the Weather API.
+
+        Args:
+            city_name (str, optional): The name of the city for which to retrieve weather data.
+
+        Returns:
+            dict: Current weather data for the specified city.
+        """
         url = self._build_url(city_name)
         response = requests.get(url)
         if not response.status_code == 200:
