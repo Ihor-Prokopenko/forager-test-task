@@ -1,21 +1,15 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
-[tool.setup]
+[tool.poetry]
 name = "weather_client"
 version = "0.1.0"
 description = ""
-author = "Ihor Prokopenko"
-author_email = "i.prokopenko@gmail.com"
+authors = ["Ihor Prokopenko <i.prokopenko.dev@gmail.com>"]
 license = "MIT"
-keywords = []
-classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.11",
-]
 
-[build-system.requires]
-python = ">=3.11"
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.31.0"
+
