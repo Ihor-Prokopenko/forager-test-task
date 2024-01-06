@@ -1,8 +1,11 @@
+"""Module providing a service for interacting with the Weather API client."""
 from weather_client.weather_client import WeatherAPIClient, WeatherResult
 
 
 class WeatherServiceExceptionError(Exception):
-    pass
+    """Exception class for Weather Service-related errors."""
+
+    pass  # NOQA
 
 
 class WeatherService(object):
@@ -13,14 +16,15 @@ class WeatherService(object):
         _results (list[WeatherResult]): A list of WeatherResult objects.
         _api_client (WeatherAPIClient): An instance of the WeatherAPIClient class.
     """
+
     def __init__(self, api_client: WeatherAPIClient) -> None:
         """
         Initialize the WeatherService.
-        Args:
-            api_client:
-        """
 
-        self._results = []
+        Args:
+            api_client: An instance of the WeatherAPIClient class.
+        """
+        self._results = []  # NOQA
         self._api_client = api_client
 
     @property
@@ -32,58 +36,56 @@ class WeatherService(object):
     def api_client(self, api_client):
         """Setter for the API client."""
         if not isinstance(api_client, WeatherAPIClient):
-            raise WeatherServiceExceptionError("Invalid API client type. Expected: WeatherAPIClient")
+            raise WeatherServiceExceptionError('Invalid API client type. Expected: WeatherAPIClient')
         self._api_client = api_client
 
-    def _save_or_update_weather_obj(self, result: WeatherResult) -> WeatherResult:
+    def _save_or_update_weather_obj(self, result_obj: WeatherResult) -> WeatherResult:
         """
         Update or Save a WeatherResult object based on the given result object.
 
         Args:
-            result (WeatherResult): A WeatherResult object containing weather information for a city.
+            result_obj (WeatherResult): A WeatherResult object containing weather information for a city.
 
         Returns:
             WeatherResult: The WeatherResult object.
         """
+        if not isinstance(result_obj, WeatherResult):
+            raise WeatherServiceExceptionError('Invalid result type. Expected: WeatherResult')
+        city_name = result_obj.city_name
 
-        if not isinstance(result, WeatherResult):
-            raise WeatherServiceExceptionError("Invalid result type. Expected: WeatherResult")
-        city_name = result.city_name
-
-        existing_obj = [obj for obj in self._results if obj.city_name.lower() == city_name.lower()]
+        existing_obj: list[WeatherResult] = [obj for obj in self._results if obj.city_name.lower() == city_name.lower()]  # NOQA
         if existing_obj:
-            obj = existing_obj[0]
-            obj.temperature = result.temperature
-            obj.condition = result.condition
-            obj.last_updated = result.last_updated
-            return obj
-        self._results.append(result)
-        return result
+            weather_result = existing_obj[0]
+            weather_result.temperature = result_obj.temperature
+            weather_result.condition = result_obj.condition
+            weather_result.last_updated = result_obj.last_updated
+            return weather_result
+        self._results.append(result_obj)
+        return result_obj
 
-    def save_results(self, result: WeatherResult | list[WeatherResult]) -> WeatherResult | list[WeatherResult] | None:
+    def save_results(self, result_obj: WeatherResult | list[WeatherResult])\
+            -> WeatherResult | list[WeatherResult] | None:
         """
         Save weather results in the WeatherService.
 
         Args:
-            result (dict or list): Weather information for one or multiple cities.
+            result_obj (dict or list): Weather information for one or multiple cities.
 
         Returns:
             WeatherResult, list[WeatherResult], or None: Saved WeatherResult objects.
         """
-        if not result:
+        if not result_obj:
             return None
-        if isinstance(result, list):
+        if isinstance(result_obj, list):
             return_res: list[WeatherResult] = []
-            for item in result:
-                new_obj: WeatherResult = self._save_or_update_weather_obj(item)
+            for new_result in result_obj:
+                new_obj: WeatherResult = self._save_or_update_weather_obj(new_result)
                 return_res.append(new_obj)
             return return_res
-        elif isinstance(result, WeatherResult):
-            new_obj: WeatherResult = self._save_or_update_weather_obj(result)
-            return new_obj
-        else:
-            raise WeatherServiceExceptionError(f"Invalid result type: {type(result)}."
-                                               f" Must be WeatherResult or list[WeatherResult]")
+        elif isinstance(result_obj, WeatherResult):
+            return self._save_or_update_weather_obj(result_obj)
+        raise WeatherServiceExceptionError(f'Invalid result type: {type(result_obj)}. '      # NOQA
+                                           f'Must be WeatherResult or list[WeatherResult]')  # NOQA
 
     def get_results(self, city_name: str = None) -> WeatherResult | list[WeatherResult]:
         """
@@ -97,7 +99,7 @@ class WeatherService(object):
         """
         if not city_name:
             return self._results
-        return [result for result in self._results if result.city_name.lower() == city_name.lower()]
+        return [result_obj for result_obj in self._results if result_obj.city_name.lower() == city_name.lower()]
 
     def clear_results(self, city_name: str = None) -> bool:
         """
@@ -109,13 +111,12 @@ class WeatherService(object):
         Returns:
             bool: True if results were cleared successfully.
         """
-
         if not city_name:
-            self._results = []
+            self._results = []  # NOQA
             return True
-        if not city_name.lower() in [result.city_name.lower() for result in self._results]:
-            raise WeatherServiceExceptionError(f"City not found: {city_name}")
-        self._results = [result for result in self._results if result.city_name.lower() != city_name.lower()]
+        if not city_name.lower() in [result.city_name.lower() for result in self._results]:  # NOQA
+            raise WeatherServiceExceptionError(f'City not found: {city_name}')  # NOQA
+        self._results = [result for result in self._results if result.city_name.lower() != city_name.lower()]  # NOQA
         return True
 
     def get_results_count(self) -> int:
@@ -125,7 +126,6 @@ class WeatherService(object):
         Returns:
             int: The count of stored weather results.
         """
-
         return len(self._results)
 
     def get_results_as_str(self) -> str:
@@ -135,7 +135,7 @@ class WeatherService(object):
         Returns:
             str: String representation of all stored weather results.
         """
-        return "\n".join([str(result) for result in self._results])
+        return '\n'.join([str(result_obj) for result_obj in self._results])
 
     def get_current_weather(self, city_name: str | list[str]) -> WeatherResult | list[WeatherResult]:
         """
@@ -147,14 +147,12 @@ class WeatherService(object):
         Returns:
             WeatherResult or list[WeatherResult]: The current weather for the specified city or cities.
         """
-
         client: WeatherAPIClient = self._api_client
         if isinstance(city_name, list):
             weather: list[WeatherResult] = [client.get_current_weather(city_name=city) for city in city_name]
         elif isinstance(city_name, str):
             weather: WeatherResult = client.get_current_weather(city_name=city_name)
         else:
-            raise WeatherServiceExceptionError(f"Invalid city_name type: {type(city_name)}. Must be str or list[str]")
-        weather_obj: WeatherResult = self.save_results(weather)
-
-        return weather_obj
+            raise WeatherServiceExceptionError(f'Invalid city_name type: {type(city_name)}. '  # NOQA
+                                               f'Must be str or list[str]')  # NOQA
+        return self.save_results(weather)
