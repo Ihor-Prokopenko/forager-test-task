@@ -7,7 +7,9 @@
 ## Installation
 To install the package, use the following command:
 
-- ```pip install git+https://github.com/Ihor-Prokopenko/forager-test-task.git```
+```python
+pip install git+https://github.com/Ihor-Prokopenko/forager-test-task.git
+```
 
 ## Getting Started
 ### <span style="color:red">REQUIRED</span> :Before using the service, you need to create an account on [weatherapi.com](https://www.weatherapi.com/) and obtain an API key.
