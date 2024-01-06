@@ -1,21 +1,27 @@
+"""Module providing a client for interacting with the Weather API."""
+
+from urllib.parse import urlencode, urljoin
+
 import requests
-from urllib.parse import urljoin, urlencode
 
-BASE_URL = "https://api.weatherapi.com/"
-WEATHER_API_PATH = "v1/current.json"
+BASE_URL = 'https://api.weatherapi.com/'
+WEATHER_API_PATH = 'v1/current.json'
 
 
-class WeatherAPIException(Exception):
+class WeatherAPIExceptionError(Exception):
+    """Exception class for Weather API-related errors."""
+
     pass
 
 
-class WeatherAPIClient:
+class WeatherAPIClient(object):
     """
     Client for interacting with the Weather API.
 
     Attributes:
         api_key (str): The API key for accessing the Weather API.
     """
+
     def __init__(self, api_key):
         self.api_key = api_key
         self.base_url = BASE_URL
@@ -26,7 +32,7 @@ class WeatherAPIClient:
         """Validate the connection to the Weather API."""
         response = requests.get(self.base_url)
         if not response.status_code == 200:
-            raise WeatherAPIException(f"Failed to connect to Weather API. "
+            raise WeatherAPIExceptionError(f"Failed to connect to Weather API. "
                                       f"Status code: {response.status_code}")
 
     def _build_url(self, city_name: str = None) -> str:
@@ -81,7 +87,7 @@ class WeatherAPIClient:
         url = self._build_url(city_name)
         response = requests.get(url)
         if not response.status_code == 200:
-            raise WeatherAPIException(f"{response.json().get('error', {}).get('message')} "
+            raise WeatherAPIExceptionError(f"{response.json().get('error', {}).get('message')} "
                                       f"Status code: {response.status_code}")
 
         return self._format_weather_data(response.json())

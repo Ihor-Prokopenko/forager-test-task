@@ -5,7 +5,7 @@ class WeatherServiceException(Exception):
     pass
 
 
-class WeatherResult:
+class WeatherResult(object):
     """
     Represents the weather result for a city.
 
@@ -26,7 +26,7 @@ class WeatherResult:
                 f"Condition: {self.condition}, Last Updated: {self.last_updated}")
 
 
-class WeatherService:
+class WeatherService(object):
     """
     Handles weather-related operations and results.
 

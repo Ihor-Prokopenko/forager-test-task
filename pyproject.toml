@@ -13,3 +13,6 @@ license = "MIT"
 python = "^3.11"
 requests = "^2.31.0"
 
+[tool.poetry.group.dev.dependencies]
+wemake-python-styleguide = "^0.18.0"
+
