@@ -7,7 +7,9 @@
 ## Installation
 To install the package, use the following command:
 
-- ```pip install git+https://github.com/Ihor-Prokopenko/forager-test-task.git```
+```python
+pip install git+https://github.com/Ihor-Prokopenko/forager-test-task.git
+```
 
 ## Getting Started
 ### <span style="color:red">REQUIRED</span> :Before using the service, you need to create an account on [weatherapi.com](https://www.weatherapi.com/) and obtain an API key.
@@ -88,24 +90,8 @@ api_key = "your_weather_api_key"
 """Create an instance of the WeatherAPIClient class"""
 client = WeatherAPIClient(api_key)
 
-"""Request the current weather for a specific city via WeatherAPIClient"""
-weather_by_city_via_client = client.get_current_weather('London')
-print(weather_by_city_via_client)
-# City: London, Temp: 6.0, Condition: Partly cloudy, Last Updated: 2024-01-06 12:30
-
 """Create an instance of the WeatherService class"""
 service = WeatherService(client)
-
-"""Save the current weather for a specific city"""
-saved = service.save_results(weather_by_city_via_client)
-print(saved)
-# City: London, Temp: 6.0, Condition: Partly cloudy, Last Updated: 2024-01-06 12:30
-
-"""Get stored results for a specific city or all stored cities"""
-saved_results = service.get_results()
-print(saved_results)
-# [<weather_client.weather_client.WeatherResult object at 0x7f0d4abe5410>,
-# <weather_client.weather_client.WeatherResult object at 0x7f0d4ab4eed0>]
 
 """Get current weather results for a specific city, cities list"""
 cities = ['london', 'Paris']
@@ -114,6 +100,24 @@ print(results)
 # [<weather_client.weather_client.WeatherResult object at 0x7f0d4abe5410>,
 # <weather_client.weather_client.WeatherResult object at 0x7f0d4ab4eed0>]
 
+"""Also you can request the current weather for a specific city via WeatherAPIClient and save into WeatherService"""
+weather_by_city_via_client = client.get_current_weather('London')
+print(weather_by_city_via_client)
+# City: London, Temp: 6.0, Condition: Partly cloudy, Last Updated: 2024-01-06 12:30
+
+#Save the current weather for a specific city
+saved = service.save_results(weather_by_city_via_client)
+print(saved)
+# City: London, Temp: 6.0, Condition: Partly cloudy, Last Updated: 2024-01-06 12:30
+
+"""Get stored results for a specific city or all stored cities"""
+stored_results_london = service.get_results('London')
+print(stored_results_london)
+# City: London, Temp: 6.0, Condition: Partly cloudy, Last Updated: 2024-01-06 12:30
+stored_results = service.get_results()
+print(stored_results)
+# [<weather_client.weather_client.WeatherResult object at 0x7f0d4abe5410>,
+# <weather_client.weather_client.WeatherResult object at 0x7f0d4ab4eed0>]
 
 """Clear weather results for a specific city or all stored cities"""
 deleted = service.clear_results('london')
