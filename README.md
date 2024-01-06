@@ -91,7 +91,7 @@ client = WeatherAPIClient(api_key)
 """Request the current weather for a specific city via WeatherAPIClient"""
 weather_by_city_via_client = client.get_current_weather('London')
 print(weather_by_city_via_client)
-# City: London, Temp: 42.8, Condition: Partly cloudy, Last Updated: 2024-01-06 11:45
+# City: London, Temp: 6.0, Condition: Partly cloudy, Last Updated: 2024-01-06 12:30
 
 """Create an instance of the WeatherService class"""
 service = WeatherService(client)
@@ -99,7 +99,7 @@ service = WeatherService(client)
 """Save the current weather for a specific city"""
 saved = service.save_results(weather_by_city_via_client)
 print(saved)
-# City: Paris, Temp: 44.6, Condition: Partly cloudy, Last Updated: 2024-01-06 12:30
+# City: London, Temp: 6.0, Condition: Partly cloudy, Last Updated: 2024-01-06 12:30
 
 """Get stored results for a specific city or all stored cities"""
 saved_results = service.get_results()
