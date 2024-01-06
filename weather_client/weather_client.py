@@ -14,6 +14,38 @@ class WeatherAPIExceptionError(Exception):
     pass
 
 
+class WeatherResult(object):
+    """
+    Represents the weather result for a city.
+
+    Attributes:
+        city_name (str): The name of the city.
+        temperature (float): The temperature in Celsius.
+        condition (str): The weather condition description.
+        last_updated (str): The timestamp of the last update.
+    """
+
+    def __init__(self, city_name: str, temperature: int | float, condition: str, last_updated: str) -> None:
+        """
+        Initialize the WeatherResult.
+        Args:
+            city_name:
+            temperature:
+            condition:
+            last_updated:
+        """
+
+        self.city_name = city_name
+        self.temperature = temperature
+        self.condition = condition
+        self.last_updated = last_updated
+
+    def __str__(self) -> str:
+        """Returns a string representation of the WeatherResult."""
+        return (f"City: {self.city_name}, Temp: {self.temperature}, "
+                f"Condition: {self.condition}, Last Updated: {self.last_updated}")
+
+
 class WeatherAPIClient(object):
     """
     Client for interacting with the Weather API.
@@ -44,6 +76,9 @@ class WeatherAPIClient(object):
     @api_key.setter
     def api_key(self, api_key: str) -> None:
         """Setter for the API key."""
+
+        if not isinstance(api_key, str):
+            raise WeatherAPIExceptionError("Invalid API key type. Expected: str")
         self._api_key = api_key
 
     def _build_url(self, city_name) -> str:
@@ -75,27 +110,24 @@ class WeatherAPIClient(object):
                                            f"Status code: {response.status_code}")
 
     @staticmethod
-    def _format_weather_data(data: dict) -> dict:
+    def _weather_data_to_object(data: dict) -> WeatherResult:
         """
-        Format raw weather data from the API response.
-
         Args:
-            data (dict): Raw weather data from the API response.
+            data: dict: Weather data.
 
         Returns:
-            dict: Formatted weather data.
+            WeatherResult:
         """
 
         formatted_data = {
-            data.get('location', {}).get('name'): {
+                'city_name': data.get('location', {}).get('name'),
                 'temperature': data.get('current', {}).get('temp_f'),
                 'condition': data.get('current', {}).get('condition', {}).get('text'),
                 'last_updated': data.get('current', {}).get('last_updated'),
-            }
         }
-        return formatted_data
+        return WeatherResult(**formatted_data)
 
-    def get_current_weather(self, city_name: str) -> dict:
+    def get_current_weather(self, city_name: str) -> WeatherResult:
         """
         Get the current weather for a specific city from the Weather API.
 
@@ -111,5 +143,4 @@ class WeatherAPIClient(object):
         if not response.status_code == 200:
             raise WeatherAPIExceptionError(f"{response.json().get('error', {}).get('message')} "
                                            f"Status code: {response.status_code}")
-
-        return self._format_weather_data(response.json())
+        return self._weather_data_to_object(response.json())
