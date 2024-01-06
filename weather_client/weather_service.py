@@ -1,72 +1,66 @@
-from weather_client.weather_client import WeatherAPIClient
+from weather_client.weather_client import WeatherAPIClient, WeatherResult
 
 
-class WeatherServiceException(Exception):
+class WeatherServiceExceptionError(Exception):
     pass
 
 
-class WeatherResult:
-    """
-    Represents the weather result for a city.
-
-    Attributes:
-        city_name (str): The name of the city.
-        temperature (float): The temperature in Celsius.
-        condition (str): The weather condition description.
-        last_updated (str): The timestamp of the last update.
-    """
-    def __init__(self, city_name: str, temperature: float, condition: str, last_updated: str):
-        self.city_name = city_name
-        self.temperature = temperature
-        self.condition = condition
-        self.last_updated = last_updated
-
-    def __str__(self):
-        return (f"City: {self.city_name}, Temp: {self.temperature}, "
-                f"Condition: {self.condition}, Last Updated: {self.last_updated}")
-
-
-class WeatherService:
+class WeatherService(object):
     """
     Handles weather-related operations and results.
 
     Attributes:
-        results (list[WeatherResult]): A list of WeatherResult objects.
-        api_client (WeatherAPIClient): An instance of the WeatherAPIClient class.
+        _results (list[WeatherResult]): A list of WeatherResult objects.
+        _api_client (WeatherAPIClient): An instance of the WeatherAPIClient class.
     """
-    def __init__(self):
-        self.results = []
-        self.api_client = WeatherAPIClient
-
-    def _update_or_create_weather_obj(self, result: dict) -> WeatherResult:
+    def __init__(self, api_client: WeatherAPIClient) -> None:
         """
-        Update or create a WeatherResult object based on the given result dictionary.
+        Initialize the WeatherService.
+        Args:
+            api_client:
+        """
+
+        self._results = []
+        self._api_client = api_client
+
+    @property
+    def api_client(self):
+        """Getter for the API client."""
+        return self._api_client
+
+    @api_client.setter
+    def api_client(self, api_client):
+        """Setter for the API client."""
+        if not isinstance(api_client, WeatherAPIClient):
+            raise WeatherServiceExceptionError("Invalid API client type. Expected: WeatherAPIClient")
+        self._api_client = api_client
+
+    def _save_or_update_weather_obj(self, result: WeatherResult) -> WeatherResult:
+        """
+        Update or Save a WeatherResult object based on the given result object.
 
         Args:
-            result (dict): A dictionary containing weather information for a city.
+            result (WeatherResult): A WeatherResult object containing weather information for a city.
 
         Returns:
             WeatherResult: The WeatherResult object.
         """
-        city_name = list(result.keys())[0]
 
-        for existing_obj in self.results:
-            if existing_obj.city_name.lower() == city_name.lower():
-                existing_obj.temperature = result.get(city_name, {}).get("temperature")
-                existing_obj.condition = result.get(city_name, {}).get("condition")
-                existing_obj.last_updated = result.get(city_name, {}).get("last_updated")
-                return existing_obj
+        if not isinstance(result, WeatherResult):
+            raise WeatherServiceExceptionError("Invalid result type. Expected: WeatherResult")
+        city_name = result.city_name
 
-        weather_obj = WeatherResult(
-            city_name=city_name,
-            temperature=result.get(city_name, {}).get("temperature"),
-            condition=result.get(city_name, {}).get("condition"),
-            last_updated=result.get(city_name, {}).get("last_updated")
-        )
-        self.results.append(weather_obj)
-        return weather_obj
+        existing_obj = [obj for obj in self._results if obj.city_name.lower() == city_name.lower()]
+        if existing_obj:
+            obj = existing_obj[0]
+            obj.temperature = result.temperature
+            obj.condition = result.condition
+            obj.last_updated = result.last_updated
+            return obj
+        self._results.append(result)
+        return result
 
-    def save_result(self, result: dict | list[dict]) -> WeatherResult | list[WeatherResult] | None:
+    def save_results(self, result: WeatherResult | list[WeatherResult]) -> WeatherResult | list[WeatherResult] | None:
         """
         Save weather results in the WeatherService.
 
@@ -81,14 +75,15 @@ class WeatherService:
         if isinstance(result, list):
             return_res: list[WeatherResult] = []
             for item in result:
-                new_obj: WeatherResult = self._update_or_create_weather_obj(item)
+                new_obj: WeatherResult = self._save_or_update_weather_obj(item)
                 return_res.append(new_obj)
             return return_res
-        elif isinstance(result, dict):
-            new_obj: WeatherResult = self._update_or_create_weather_obj(result)
+        elif isinstance(result, WeatherResult):
+            new_obj: WeatherResult = self._save_or_update_weather_obj(result)
             return new_obj
         else:
-            raise WeatherServiceException(f"Invalid result type: {type(result)}. Must be dict or list[dict]")
+            raise WeatherServiceExceptionError(f"Invalid result type: {type(result)}."
+                                               f" Must be WeatherResult or list[WeatherResult]")
 
     def get_results(self, city_name: str = None) -> WeatherResult | list[WeatherResult]:
         """
@@ -100,9 +95,9 @@ class WeatherService:
         Returns:
             WeatherResult or list[WeatherResult]: Weather results for the specified city or all cities.
         """
-        if city_name:
-            return [result for result in self.results if result.city_name.lower() == city_name.lower()]
-        return self.results
+        if not city_name:
+            return self._results
+        return [result for result in self._results if result.city_name.lower() == city_name.lower()]
 
     def clear_results(self, city_name: str = None) -> bool:
         """
@@ -114,12 +109,13 @@ class WeatherService:
         Returns:
             bool: True if results were cleared successfully.
         """
+
         if not city_name:
-            self.results = []
+            self._results = []
             return True
-        if not city_name.lower() in [result.city_name.lower() for result in self.results]:
-            raise WeatherServiceException(f"City not found: {city_name}")
-        self.results = [result for result in self.results if result.city_name.lower() != city_name.lower()]
+        if not city_name.lower() in [result.city_name.lower() for result in self._results]:
+            raise WeatherServiceExceptionError(f"City not found: {city_name}")
+        self._results = [result for result in self._results if result.city_name.lower() != city_name.lower()]
         return True
 
     def get_results_count(self) -> int:
@@ -129,7 +125,8 @@ class WeatherService:
         Returns:
             int: The count of stored weather results.
         """
-        return len(self.results)
+
+        return len(self._results)
 
     def get_results_as_str(self) -> str:
         """
@@ -138,26 +135,26 @@ class WeatherService:
         Returns:
             str: String representation of all stored weather results.
         """
-        return "\n".join([str(result) for result in self.results])
+        return "\n".join([str(result) for result in self._results])
 
-    def get_current_weather(self, city_name: str | list[str], api_key: str) -> WeatherResult | list[WeatherResult]:
+    def get_current_weather(self, city_name: str | list[str]) -> WeatherResult | list[WeatherResult]:
         """
         Get and save the current weather for one or multiple cities.
 
         Args:
             city_name (str or list[str]): The name of the city or a list of city names.
-            api_key (str): The API key for accessing weather data.
 
         Returns:
             WeatherResult or list[WeatherResult]: The current weather for the specified city or cities.
         """
-        client: WeatherAPIClient = self.api_client(api_key)
+
+        client: WeatherAPIClient = self._api_client
         if isinstance(city_name, list):
-            weather: list[dict] = [client.get_current_weather(city_name=city) for city in city_name]
+            weather: list[WeatherResult] = [client.get_current_weather(city_name=city) for city in city_name]
         elif isinstance(city_name, str):
-            weather: dict = client.get_current_weather(city_name=city_name)
+            weather: WeatherResult = client.get_current_weather(city_name=city_name)
         else:
-            raise WeatherServiceException(f"Invalid city_name type: {type(city_name)}. Must be str or list[str]")
-        weather_obj: WeatherResult = self.save_result(weather)
+            raise WeatherServiceExceptionError(f"Invalid city_name type: {type(city_name)}. Must be str or list[str]")
+        weather_obj: WeatherResult = self.save_results(weather)
 
         return weather_obj
