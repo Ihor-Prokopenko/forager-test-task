@@ -32,7 +32,7 @@ Private methods:
 - `_build_url(city_name: str = None) -> str`: Builds the full URL for the Weather API request.
 - `_weather_data_to_object(data: dict) -> WeatherResult`: Creates a WeatherResult object based on weather data.
 
-## Example using WeatherAPIClient
+## Example using WeatherAPIClient:
 ```python
 from weather_client import WeatherAPIClient
 
@@ -47,12 +47,12 @@ weather_by_city_via_client = client.get_current_weather('London')
 print(weather_by_city_via_client)
 # City: London, Temp: 6.0, Condition: Partly cloudy, Last Updated: 2024-01-06 12:30
 print(weather_by_city_via_client.city_name)
-print(weather_by_city_via_client.temperature)
-print(weather_by_city_via_client.condition)
-print(weather_by_city_via_client.last_updated)
 # London
+print(weather_by_city_via_client.temperature)
 # 6.0
+print(weather_by_city_via_client.condition)
 # Partly cloudy
+print(weather_by_city_via_client.last_updated)
 # 2024-01-06 12:30
 ```
 
@@ -79,7 +79,7 @@ Public methods:
 Private methods:
 - `_save_or_update_weather_obj(self, result: WeatherResult) -> WeatherResult`: Update or Save a WeatherResult object based on the given result object.
 
-## Example using WeatherService
+## Example using WeatherService:
 ```python
 from weather_client import WeatherAPIClient, WeatherService
 
@@ -134,4 +134,39 @@ print(results_str)
 
 ***
 
+## WeatherResult class
+
+The WeatherResult class represents the weather result for a city.
+
+Attributes:
+- `city_name (str)`: The name of the city.
+- `temperature (float)`: The temperature in Celsius.
+- `condition (str)`: The weather condition description.
+- `last_updated (str)`: The timestamp of the last update.
+
+Methods:
+- `__init__(self, city_name: str, temperature: int | float, condition: str, last_updated: str) -> None`: Initialize the WeatherResult class.
+
+Args:
+- `city_name (str)`: The name of the city.
+- `temperature (int | float)`: The temperature in Celsius.
+- `condition (str)`: The weather condition description.
+- `last_updated (str)`: The timestamp of the last update.
+
+## Example:
+```python
+from weather_client import WeatherResult
+
+# Create an instance of the WeatherResult class
+result = WeatherResult(city_name='London', temperature=6.0, condition='Partly cloudy', last_updated='2024-01-06 12:30')
+
+# Print the string representation of the WeatherResult
+print(result)
+# City: London, Temp: 6.0, Condition: Partly cloudy, Last Updated: 2024-01-06 12:30
+
+```
+
+***
+
+## Conclusion
 Feel free to use and extend this package to suit your weather-related needs. If you encounter any issues, please refer to the WeatherAPIException and WeatherServiceException classes for error handling.
