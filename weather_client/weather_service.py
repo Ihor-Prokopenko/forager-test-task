@@ -1,7 +1,7 @@
 from weather_client.weather_client import WeatherAPIClient
 
 
-class WeatherServiceException(Exception):
+class WeatherServiceExceptionError(Exception):
     pass
 
 
@@ -15,13 +15,14 @@ class WeatherResult(object):
         condition (str): The weather condition description.
         last_updated (str): The timestamp of the last update.
     """
-    def __init__(self, city_name: str, temperature: float, condition: str, last_updated: str):
+
+    def __init__(self, city_name: str, temperature: float, condition: str, last_updated: str) -> None:
         self.city_name = city_name
         self.temperature = temperature
         self.condition = condition
         self.last_updated = last_updated
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (f"City: {self.city_name}, Temp: {self.temperature}, "
                 f"Condition: {self.condition}, Last Updated: {self.last_updated}")
 
@@ -32,11 +33,29 @@ class WeatherService(object):
 
     Attributes:
         results (list[WeatherResult]): A list of WeatherResult objects.
-        api_client (WeatherAPIClient): An instance of the WeatherAPIClient class.
+        _api_client (WeatherAPIClient): An instance of the WeatherAPIClient class.
     """
-    def __init__(self):
+    def __init__(self, api_client: WeatherAPIClient) -> None:
+        """
+        Initialize the WeatherService.
+        Args:
+            api_client:
+        """
+
         self.results = []
-        self.api_client = WeatherAPIClient
+        self._api_client = api_client
+
+    @property
+    def api_client(self):
+        """Getter for the API client."""
+        return self._api_client
+
+    @api_client.setter
+    def api_client(self, api_client):
+        """Setter for the API client."""
+        if not isinstance(api_client, WeatherAPIClient):
+            raise WeatherServiceExceptionError("Invalid API client type. Expected: WeatherAPIClient")
+        self._api_client = api_client
 
     def _update_or_create_weather_obj(self, result: dict) -> WeatherResult:
         """
@@ -88,7 +107,7 @@ class WeatherService(object):
             new_obj: WeatherResult = self._update_or_create_weather_obj(result)
             return new_obj
         else:
-            raise WeatherServiceException(f"Invalid result type: {type(result)}. Must be dict or list[dict]")
+            raise WeatherServiceExceptionError(f"Invalid result type: {type(result)}. Must be dict or list[dict]")
 
     def get_results(self, city_name: str = None) -> WeatherResult | list[WeatherResult]:
         """
@@ -118,7 +137,7 @@ class WeatherService(object):
             self.results = []
             return True
         if not city_name.lower() in [result.city_name.lower() for result in self.results]:
-            raise WeatherServiceException(f"City not found: {city_name}")
+            raise WeatherServiceExceptionError(f"City not found: {city_name}")
         self.results = [result for result in self.results if result.city_name.lower() != city_name.lower()]
         return True
 
@@ -140,24 +159,24 @@ class WeatherService(object):
         """
         return "\n".join([str(result) for result in self.results])
 
-    def get_current_weather(self, city_name: str | list[str], api_key: str) -> WeatherResult | list[WeatherResult]:
+    def get_current_weather(self, city_name: str | list[str]) -> WeatherResult | list[WeatherResult]:
         """
         Get and save the current weather for one or multiple cities.
 
         Args:
             city_name (str or list[str]): The name of the city or a list of city names.
-            api_key (str): The API key for accessing weather data.
 
         Returns:
             WeatherResult or list[WeatherResult]: The current weather for the specified city or cities.
         """
-        client: WeatherAPIClient = self.api_client(api_key)
+
+        client: WeatherAPIClient = self._api_client
         if isinstance(city_name, list):
             weather: list[dict] = [client.get_current_weather(city_name=city) for city in city_name]
         elif isinstance(city_name, str):
             weather: dict = client.get_current_weather(city_name=city_name)
         else:
-            raise WeatherServiceException(f"Invalid city_name type: {type(city_name)}. Must be str or list[str]")
+            raise WeatherServiceExceptionError(f"Invalid city_name type: {type(city_name)}. Must be str or list[str]")
         weather_obj: WeatherResult = self.save_result(weather)
 
         return weather_obj
