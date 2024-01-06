@@ -5,8 +5,6 @@ from weather_client.weather_client import WeatherAPIClient, WeatherResult
 class WeatherServiceExceptionError(Exception):
     """Exception class for Weather Service-related errors."""
 
-    pass  # NOQA
-
 
 class WeatherService(object):
     """
@@ -24,7 +22,7 @@ class WeatherService(object):
         Args:
             api_client: An instance of the WeatherAPIClient class.
         """
-        self._results = []  # NOQA
+        self._results = []
         self._api_client = api_client
 
     @property
@@ -53,7 +51,7 @@ class WeatherService(object):
             raise WeatherServiceExceptionError('Invalid result type. Expected: WeatherResult')
         city_name = result_obj.city_name
 
-        existing_obj: list[WeatherResult] = [obj for obj in self._results if obj.city_name.lower() == city_name.lower()]  # NOQA
+        existing_obj: list[WeatherResult] = [obj for obj in self._results if obj.city_name.lower() == city_name.lower()]
         if existing_obj:
             weather_result = existing_obj[0]
             weather_result.temperature = result_obj.temperature
@@ -84,8 +82,8 @@ class WeatherService(object):
             return return_res
         elif isinstance(result_obj, WeatherResult):
             return self._save_or_update_weather_obj(result_obj)
-        raise WeatherServiceExceptionError(f'Invalid result type: {type(result_obj)}. '      # NOQA
-                                           f'Must be WeatherResult or list[WeatherResult]')  # NOQA
+        raise WeatherServiceExceptionError(f'Invalid result type: {type(result_obj)}. '
+                                           f'Must be WeatherResult or list[WeatherResult]')
 
     def get_results(self, city_name: str = None) -> WeatherResult | list[WeatherResult]:
         """
@@ -112,11 +110,11 @@ class WeatherService(object):
             bool: True if results were cleared successfully.
         """
         if not city_name:
-            self._results = []  # NOQA
+            self._results = []
             return True
-        if not city_name.lower() in [result.city_name.lower() for result in self._results]:  # NOQA
-            raise WeatherServiceExceptionError(f'City not found: {city_name}')  # NOQA
-        self._results = [result for result in self._results if result.city_name.lower() != city_name.lower()]  # NOQA
+        if not city_name.lower() in [result.city_name.lower() for result in self._results]:
+            raise WeatherServiceExceptionError(f'City not found: {city_name}')
+        self._results = [result for result in self._results if result.city_name.lower() != city_name.lower()]
         return True
 
     def get_results_count(self) -> int:
@@ -153,6 +151,6 @@ class WeatherService(object):
         elif isinstance(city_name, str):
             weather: WeatherResult = client.get_current_weather(city_name=city_name)
         else:
-            raise WeatherServiceExceptionError(f'Invalid city_name type: {type(city_name)}. '  # NOQA
-                                               f'Must be str or list[str]')  # NOQA
+            raise WeatherServiceExceptionError(f'Invalid city_name type: {type(city_name)}. '  
+                                               f'Must be str or list[str]')
         return self.save_results(weather)

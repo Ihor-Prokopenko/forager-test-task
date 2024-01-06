@@ -41,8 +41,12 @@ class WeatherResult(object):
 
     def __str__(self) -> str:
         """Generate a string representation of the WeatherResult."""
-        return (f'City: {self.city_name}, Temp: {self.temperature}, '               # NOQA
-                f'Condition: {self.condition}, Last Updated: {self.last_updated}')  # NOQA
+        return 'City: {0}, Temp: {1}, Condition: {2}, Last Updated: {3}'.format(
+            self.city_name,
+            self.temperature,
+            self.condition,
+            self.last_updated,
+        )
 
 
 class WeatherAPIClient(object):
@@ -82,9 +86,9 @@ class WeatherAPIClient(object):
     def _validate_api(self) -> None:
         """Validate the connection to the Weather API."""
         response = requests.get(self._base_url, timeout=5)
-        if response.status_code != 200:  # NOQA
-            raise WeatherAPIExceptionError(f'Failed to connect to Weather API. '     # NOQA
-                                           f'Status code: {response.status_code}')   # NOQA
+        if response.status_code != requests.codes.ok:
+            error_message = 'Failed to connect to Weather API. Status code: {0}'.format(response.status_code)
+            raise WeatherAPIExceptionError(error_message)
 
     def _build_url(self, city_name) -> str:
         """
@@ -96,30 +100,30 @@ class WeatherAPIClient(object):
         Returns:
             str: The full URL for the Weather API request.
         """
-        full_url = urljoin(self._base_url, self._api_path)
+        url = urljoin(self._base_url, self._api_path)
 
-        params = {  # NOQA
+        query_params = {
             'key': self._api_key,
             'q': city_name,
         }
-        return f'{full_url}?{urlencode(params)}'  # NOQA
+        params_string = urlencode(query_params)
+        return '{0}?{1}'.format(url, params_string)
 
-    @staticmethod
-    def _weather_data_to_object(data: dict) -> WeatherResult:  # NOQA
+    def _weather_data_to_object(self, weather_data: dict) -> WeatherResult:
         """
         Convert weather data to a WeatherResult object.
 
         Args:
-            data: dict: Weather data.
+            weather_data: dict: Weather data.
 
         Returns:
             WeatherResult: Weather result object.
         """
         formatted_data = {
-            'city_name': data.get('location', {}).get('name'),
-            'temperature': data.get('current', {}).get('temp_c'),
-            'condition': data.get('current', {}).get('condition', {}).get('text'),
-            'last_updated': data.get('current', {}).get('last_updated'),
+            'city_name': weather_data.get('location', {}).get('name'),
+            'temperature': weather_data.get('current', {}).get('temp_c'),
+            'condition': weather_data.get('current', {}).get('condition', {}).get('text'),
+            'last_updated': weather_data.get('current', {}).get('last_updated'),
         }
         return WeatherResult(**formatted_data)
 
@@ -137,6 +141,7 @@ class WeatherAPIClient(object):
         response = requests.get(url, timeout=5)
         error_message = response.json().get('error', {}).get('message')
         status_code = response.status_code
-        if response.status_code != 200:  # NOQA
-            raise WeatherAPIExceptionError(f'{error_message} Status code: {status_code}')  # NOQA
+        if response.status_code != requests.codes.ok:
+            error_message = '{0}Status code: {1}'.format(error_message, status_code)
+            raise WeatherAPIExceptionError(error_message)
         return self._weather_data_to_object(response.json())
