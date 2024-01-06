@@ -1,5 +1,4 @@
 """Module providing a client for interacting with the Weather API."""
-
 from urllib.parse import urlencode, urljoin
 
 import requests
@@ -56,7 +55,7 @@ class WeatherAPIClient(object):
         _api_path (str): The path for the current weather endpoint of the Weather API.
     """
 
-    def __init__(self, api_key):
+    def __init__(self, api_key: str) -> None:
         """
         Initialize the WeatherAPIClient.
         Args:
@@ -121,7 +120,7 @@ class WeatherAPIClient(object):
 
         formatted_data = {
                 'city_name': data.get('location', {}).get('name'),
-                'temperature': data.get('current', {}).get('temp_f'),
+                'temperature': data.get('current', {}).get('temp_c'),
                 'condition': data.get('current', {}).get('condition', {}).get('text'),
                 'last_updated': data.get('current', {}).get('last_updated'),
         }
