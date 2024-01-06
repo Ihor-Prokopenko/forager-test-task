@@ -88,7 +88,7 @@ class WeatherAPIClient(object):
             error_message = 'Failed to connect to Weather API. Status code: {0}'.format(response.status_code)
             raise WeatherAPIExceptionError(error_message)
 
-    def _build_url(self, city_name) -> str:
+    def _build_url(self, city_name: str) -> str:
         """
         Build the full URL for the Weather API request.
 

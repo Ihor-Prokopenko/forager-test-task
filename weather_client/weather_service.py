@@ -14,9 +14,9 @@ class WeatherResultManager(object):
         _weather_results (list[WeatherResult]): A list of WeatherResult objects.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the WeatherResultManager."""
-        self._weather_results = []
+        self._weather_results: list[WeatherResult] = []
 
     def _save_or_update_weather_obj(self, result_obj: WeatherResult) -> WeatherResult:
         """
@@ -61,10 +61,8 @@ class WeatherResultManager(object):
             return return_res
         elif isinstance(result_obj, WeatherResult):
             return self._save_or_update_weather_obj(result_obj)
-        message = 'Invalid result type: {0}. Must be WeatherResult or list[WeatherResult]'.format(type(result_obj))
-        raise WeatherServiceExceptionError(message)
 
-    def get_results(self, city_name: str = None) -> WeatherResult | list[WeatherResult]:
+    def get_results(self, city_name: str = '') -> WeatherResult | list[WeatherResult]:
         """
         Get weather results for a specific city or all cities.
 
@@ -78,7 +76,7 @@ class WeatherResultManager(object):
             return self._weather_results
         return [result_obj for result_obj in self._weather_results if result_obj.city_name.lower() == city_name.lower()]
 
-    def clear_results(self, city_name: str = None) -> bool:
+    def clear_results(self, city_name: str = '') -> bool:
         """
         Clear weather results for a specific city or all cities.
 
@@ -140,12 +138,12 @@ class WeatherService(WeatherResultManager):
         self._api_client = api_client
 
     @property
-    def api_client(self):
+    def api_client(self) -> WeatherAPIClient:
         """Getter for the API client."""
         return self._api_client
 
     @api_client.setter
-    def api_client(self, api_client):
+    def api_client(self, api_client: WeatherAPIClient) -> None:
         """Setter for the API client."""
         if not isinstance(api_client, WeatherAPIClient):
             raise WeatherServiceExceptionError('Invalid API client type. Expected: WeatherAPIClient')
@@ -163,10 +161,6 @@ class WeatherService(WeatherResultManager):
         """
         client: WeatherAPIClient = self._api_client
         if isinstance(city_name, list):
-            weather: list[WeatherResult] = [client.get_current_weather(city_name=city) for city in city_name]
+            return self.save_results([client.get_current_weather(city_name=city) for city in city_name])
         elif isinstance(city_name, str):
-            weather: WeatherResult = client.get_current_weather(city_name=city_name)
-        else:
-            message = 'Invalid city_name type: {0}. Must be str or list[str]'.format(type(city_name))
-            raise WeatherServiceExceptionError(message)
-        return self.save_results(weather)
+            return self.save_results(client.get_current_weather(city_name=city_name))
