@@ -10,8 +10,6 @@ WEATHER_API_PATH = 'v1/current.json'
 class WeatherAPIExceptionError(Exception):
     """Exception class for Weather API-related errors."""
 
-    pass  # NOQA
-
 
 class WeatherResult(object):
     """
