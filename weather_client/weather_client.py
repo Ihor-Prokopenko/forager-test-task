@@ -1,50 +1,12 @@
 """Module providing a client for interacting with the Weather API."""
 from urllib.parse import urlencode, urljoin
+from weather_client.exceptions import WeatherAPIExceptionError
+from weather_client.weather_data_classes import WeatherResult
 
 import requests
 
 BASE_URL = 'https://api.weatherapi.com/'
 WEATHER_API_PATH = 'v1/current.json'
-
-
-class WeatherAPIExceptionError(Exception):
-    """Exception class for Weather API-related errors."""
-
-
-class WeatherResult(object):
-    """
-    Represents the weather result for a city.
-
-    Attributes:
-        city_name (str): The name of the city.
-        temperature (float): The temperature in Celsius.
-        condition (str): The weather condition description.
-        last_updated (str): The timestamp of the last update.
-    """
-
-    def __init__(self, city_name: str, temperature: int | float, condition: str, last_updated: str) -> None:
-        """
-        Initialize the WeatherResult.
-
-        Args:
-            city_name (str): The name of the city.
-            temperature (int | float): The temperature in Celsius.
-            condition (str): The weather condition description.
-            last_updated (str): The timestamp of the last update.
-        """
-        self.city_name = city_name
-        self.temperature = temperature
-        self.condition = condition
-        self.last_updated = last_updated
-
-    def __str__(self) -> str:
-        """Generate a string representation of the WeatherResult."""
-        return 'City: {0}, Temp: {1}, Condition: {2}, Last Updated: {3}'.format(
-            self.city_name,
-            self.temperature,
-            self.condition,
-            self.last_updated,
-        )
 
 
 class WeatherAPIClient(object):
