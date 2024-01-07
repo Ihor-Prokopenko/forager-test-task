@@ -1,6 +1,6 @@
 """Module providing a service for interacting with the Weather API client."""
-from weather_data_classes import ForecastResult, WeatherResult
-from weather_data_managers import ForecastResultManager, WeatherResultManager
+from weather_client.weather_data_classes import ForecastResult, WeatherResult
+from weather_client.weather_data_managers import ForecastResultManager, WeatherResultManager
 
 from weather_client.exceptions import WeatherServiceExceptionError
 from weather_client.weather_api_client import WeatherAPIClient
