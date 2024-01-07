@@ -4,6 +4,7 @@
 #### This Python package provides functionality to interact with the Weather API and manage weather-related information for various cities. 
 #### The package consists of two main modules: weather_client.py for handling API requests, and weather_service.py for managing weather results.
 
+
 ## Installation
 To install the package, use the following command:
 
