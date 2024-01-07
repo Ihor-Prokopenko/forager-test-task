@@ -1,3 +1,4 @@
+"""Module providing weather-related functionality."""
 
 
 class WeatherServiceExceptionError(Exception):

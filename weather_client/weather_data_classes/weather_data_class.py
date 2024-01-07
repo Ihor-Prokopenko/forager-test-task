@@ -1,3 +1,4 @@
+"""Module providing weather-related functionality."""
 
 
 class WeatherResult(object):
@@ -34,3 +35,7 @@ class WeatherResult(object):
             self.condition,
             self.last_updated,
         )
+
+    def __repr__(self) -> str:
+        """Generate a string representation of the WeatherResult."""
+        return 'object.WeatherResult(city_name={0})'.format(self.city_name)
