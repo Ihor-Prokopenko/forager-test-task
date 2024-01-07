@@ -1,9 +1,8 @@
 """Module providing a service for interacting with the Weather API client."""
-from weather_client.weather_data_classes import ForecastResult, WeatherResult
-from weather_client.weather_data_managers import ForecastResultManager, WeatherResultManager
-
 from weather_client.exceptions import WeatherServiceExceptionError
 from weather_client.weather_api_client import WeatherAPIClient
+from weather_client.weather_data_classes import ForecastResult, WeatherResult
+from weather_client.weather_data_managers import ForecastResultManager, WeatherResultManager
 
 
 class WeatherService(WeatherResultManager, ForecastResultManager):
@@ -55,11 +54,26 @@ class WeatherService(WeatherResultManager, ForecastResultManager):
         Returns:
             WeatherResult or list[WeatherResult]: The current weather for the specified city or cities.
         """
+        if not city_name:
+            return []
+
         client: WeatherAPIClient = self._api_client
         if isinstance(city_name, list):
-            return self.save_weather([client.request_current_weather(city_name=city) for city in city_name])
+            current_weather_list: list[WeatherResult] = []
+            for city in city_name:
+                if not isinstance(city, str):
+                    raise WeatherServiceExceptionError('Invalid city type. Expected: str')
+                current_weather = client.request_current_weather(city_name=city)
+                if not current_weather:
+                    continue
+                current_weather_list.append(current_weather)
+            return self.save_weather(current_weather_list)
+
         elif isinstance(city_name, str):
-            return self.save_weather(client.request_current_weather(city_name=city_name))
+            current_weather = client.request_current_weather(city_name=city_name)
+            if not current_weather:
+                return []
+            return self.save_weather(current_weather)
 
     def request_forecast(self, city_name: str | list[str]) -> ForecastResult | list[ForecastResult]:
         """
@@ -71,8 +85,23 @@ class WeatherService(WeatherResultManager, ForecastResultManager):
         Returns:
             ForecastResult or list[ForecastResult]: The forecast for the specified city or cities.
         """
+        if not city_name:
+            return []
+
         client: WeatherAPIClient = self._api_client
         if isinstance(city_name, list):
-            return self.save_forecasts([client.request_forecast(city_name=city) for city in city_name])
+            forecast_list: list[ForecastResult] = []
+            for city in city_name:
+                if not isinstance(city, str):
+                    raise WeatherServiceExceptionError('Invalid city type. Expected: str')
+                forecast = client.request_forecast(city_name=city)
+                if not forecast:
+                    continue
+                forecast_list.append(forecast)
+            return self.save_forecasts(forecast_list)
+
         elif isinstance(city_name, str):
-            return self.save_forecasts(client.request_forecast(city_name=city_name))
+            forecast = client.request_forecast(city_name=city_name)
+            if not forecast:
+                return []
+            return self.save_forecasts(forecast)

@@ -1,10 +1,7 @@
 """Module providing a client for interacting with the Weather API."""
-from urllib.parse import urlencode, urljoin
-
-from weather_client.weather_data_classes import ForecastResult, WeatherResult
-
 from weather_client.mixins import DataParserMixin
 from weather_client.weather_api_request_handler import WeatherAPIRequestHandler
+from weather_client.weather_data_classes import ForecastResult, WeatherResult
 
 
 class WeatherAPIClient(WeatherAPIRequestHandler, DataParserMixin):

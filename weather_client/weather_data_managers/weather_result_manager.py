@@ -1,7 +1,6 @@
 """Module providing weather-related functionality."""
-from weather_client.weather_data_classes import WeatherResult
-
 from weather_client.exceptions import WeatherServiceExceptionError
+from weather_client.weather_data_classes import WeatherResult
 
 
 class WeatherResultManager(object):
