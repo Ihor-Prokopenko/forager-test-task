@@ -25,35 +25,39 @@ Attributes:
 - `_api_key (str)`: The API key for accessing the Weather API.
 
 Public methods:
-- `get_current_weather(city_name: str) -> WeatherResult`: Retrieves the current weather for a specific city.
+- `request_current_weather(self, city_name: str)`: Request the current weather for a specific city.
+- `request_forecast(self, city_name: str)`: Request the forecast for a specific city.
 
-Private methods:
-- `_validate_api()`: Validates the connection to the Weather API.
-- `_build_url(city_name: str = None) -> str`: Builds the full URL for the Weather API request.
-- `_weather_data_to_object(data: dict) -> WeatherResult`: Creates a WeatherResult object based on weather data.
 
 ## Example using WeatherAPIClient:
 ```python
 from weather_client import WeatherAPIClient
 
-# Retrieve and set your api key
+# >>>> Retrieve and set your api key <<<<
 api_key = "your_weather_api_key"
 
-# Create an instance of the WeatherAPIClient
+# >>>> create an instance of the CLIENT <<<<
 client = WeatherAPIClient(api_key)
 
-# Request the current weather for a specific city
-weather_by_city_via_client = client.get_current_weather('London')
-print(weather_by_city_via_client)
-# City: London, Temp: 6.0, Condition: Partly cloudy, Last Updated: 2024-01-06 12:30
-print(weather_by_city_via_client.city_name)
-# London
-print(weather_by_city_via_client.temperature)
-# 6.0
-print(weather_by_city_via_client.condition)
+# >>>> request weather by city name via CLIENT <<<
+weather_in_london = client.request_current_weather('London')
+print(weather_in_london)
+# City: London, Temp: 4.0, Condition: Partly cloudy, Last Updated: 2024-01-07 17:15
+print(weather_in_london.condition)
 # Partly cloudy
-print(weather_by_city_via_client.last_updated)
-# 2024-01-06 12:30
+print(weather_in_london.temperature)
+# 4.0
+
+# >>>> request weather forecast by city name via CLIENT <<<<
+forecast_for_london = client.request_forecast('London')
+print(forecast_for_london)
+# City: London, Avg_temp: 3.5, Condition: Patchy rain possible, Date: 2024-01-07
+print(forecast_for_london.avg_temp)
+# 3.5
+print(forecast_for_london.date)
+# 2024-01-07
+print(forecast_for_london.condition)
+# Patchy rain possible
 ```
 
 ***
@@ -69,15 +73,15 @@ Attributes:
 
 Public methods:
 
-- `save_results(self, result: WeatherResult | list[WeatherResult]) -> WeatherResult | list[WeatherResult] | None`: Saves weather results in the WeatherService.
-- `get_results(city_name: str = None) -> WeatherResult | list[WeatherResult]`: Gets weather results for a specific city or all cities.
-- `clear_results(city_name: str = None) -> bool`: Clears weather results for a specific city or all cities.
-- `get_results_count() -> int`: Gets the count of stored weather results.
-- `get_results_as_str() -> str`: Gets a string representation of all stored weather results.
-- `get_current_weather(city_name: str | list[str], api_key: str) -> WeatherResult | list[WeatherResult]`: Gets and saves the current weather for one or multiple cities.
+ - `request_current_weather(self, city_name: str | list[str])`: Gets and saves the current weather for one or multiple cities.
+ - `request_forecast(self, city_name: str | list[str])`: Gets and saves the forecast for one or multiple cities.
+ - `save_weather(self, weather_obj: WeatherResult | list[WeatherResult])`: Saves weather results in the WeatherService.
+ - `save_forecasts(self, forecast_obj: ForecastResult | list[ForecastResult])`: Saves forecast results in the WeatherService.
+ - `get_weather(self, city_name: str | list[str])`: Gets weather results for a specific city or all cities.
+ - `get_forecast(self, city_name: str | list[str])`: Gets forecast results for a specific city or all cities.
+ - `clear_weather(self, city_name: str | list[str])`: Clears weather results for a specific city or all cities.
+ - `clear_forecast(self, city_name: str | list[str])`: Clears forecast results for a specific city or all cities.
 
-Private methods:
-- `_save_or_update_weather_obj(self, result: WeatherResult) -> WeatherResult`: Update or Save a WeatherResult object based on the given result object.
 
 ## Example using WeatherService:
 ```python
@@ -85,86 +89,65 @@ from weather_client import WeatherAPIClient, WeatherService
 
 api_key = "your_weather_api_key"
 
-"""Create an instance of the WeatherAPIClient class"""
+# >>>> create an instance of the CLIENT <<<<
 client = WeatherAPIClient(api_key)
 
-"""Request the current weather for a specific city via WeatherAPIClient"""
-weather_by_city_via_client = client.get_current_weather('London')
-print(weather_by_city_via_client)
-# City: London, Temp: 6.0, Condition: Partly cloudy, Last Updated: 2024-01-06 12:30
-
-"""Create an instance of the WeatherService class"""
+# >>>> create an instance of the SERVICE <<<<
 service = WeatherService(client)
 
-"""Save the current weather for a specific city"""
-saved = service.save_results(weather_by_city_via_client)
-print(saved)
-# City: London, Temp: 6.0, Condition: Partly cloudy, Last Updated: 2024-01-06 12:30
+# >>> get weather and forecast via CLIENT <<<<
+weather_in_london = client.request_current_weather('London')
+forecast_for_london = client.request_forecast('London')
 
-"""Get stored results for a specific city or all stored cities"""
-saved_results = service.get_results()
-print(saved_results)
-# [<weather_client.weather_client.WeatherResult object at 0x7f0d4abe5410>,
-# <weather_client.weather_client.WeatherResult object at 0x7f0d4ab4eed0>]
-
-"""Get current weather results for a specific city, cities list"""
-cities = ['london', 'Paris']
-results = service.get_current_weather(cities)
-print(results)
-# [<weather_client.weather_client.WeatherResult object at 0x7f0d4abe5410>,
-# <weather_client.weather_client.WeatherResult object at 0x7f0d4ab4eed0>]
+# >>>> save the results via SERVICE <<<<
+saved_forecast = service.save_forecasts(forecast_for_london)
+saved_weather = service.save_weather(weather_in_london)
+print(saved_forecast)
+# City: London, Avg_temp: 3.5, Condition: Patchy rain possible, Date: 2024-01-07
+print(saved_weather)
+# City: London, Temp: 4.0, Condition: Partly cloudy, Last Updated: 2024-01-07 17:00
 
 
-"""Clear weather results for a specific city or all stored cities"""
-deleted = service.clear_results('london')
-print(deleted)
+# >>>> request and save weather and forecast by city name via SERVICE <<<<
+cities = ['London', 'Paris']
+service.request_forecast(cities)
+service.request_current_weather(cities)
+
+print(service.get_forecasts())
+# [object.ForecastResult(city_name=London, date=2024-01-07), object.ForecastResult(city_name=Paris, date=2024-01-07)]
+print(service.get_weather())
+# [object.WeatherResult(city_name=London), object.WeatherResult(city_name=Paris)]
+
+
+# >>>> get the count of stored results <<<<
+print(service.get_weather_count())
+# 2
+print(service.get_forecasts_count())
+# 2
+
+
+# >>>> get the results as a string <<<<
+print(service.get_weather_as_str())
+# City: London, Temp: 4.0, Condition: Partly cloudy, Last Updated: 2024-01-07 17:15
+# City: Paris, Temp: 3.0, Condition: Overcast, Last Updated: 2024-01-07 18:15
+print(service.get_forecasts_as_str())
+# City: London, Avg_temp: 3.5, Condition: Patchy rain possible, Date: 2024-01-07
+# City: Paris, Avg_temp: 4.1, Condition: Patchy rain possible, Date: 2024-01-07
+
+
+# >>>> deletion results for specific or all cities <<<<
+success = service.clear_forecasts('London')
+print(success)
 # True
+print(service.get_forecasts())
+# [object.ForecastResult(city_name=Paris, date=2024-01-07)]
 
-
-"""Get the count of stored weather results"""
-print(service.get_results_count())
-# 1
-
-
-"""Get a string representation of all stored weather results"""
-results_str = service.get_results_as_str()
-print(results_str)
-# City: Paris, Temp: 7.0, Condition: Overcast, Last Updated: 2024-01-06 13:00
+service.clear_weather()
+print(service.get_weather())
+# []
 ```
 
 ***
-
-## WeatherResult class
-
-The WeatherResult class represents the weather result for a city.
-
-Attributes:
-- `city_name (str)`: The name of the city.
-- `temperature (float)`: The temperature in Celsius.
-- `condition (str)`: The weather condition description.
-- `last_updated (str)`: The timestamp of the last update.
-
-Methods:
-- `__init__(self, city_name: str, temperature: int | float, condition: str, last_updated: str) -> None`: Initialize the WeatherResult class.
-
-Args:
-- `city_name (str)`: The name of the city.
-- `temperature (int | float)`: The temperature in Celsius.
-- `condition (str)`: The weather condition description.
-- `last_updated (str)`: The timestamp of the last update.
-
-## Example:
-```python
-from weather_client import WeatherResult
-
-# Create an instance of the WeatherResult class
-result = WeatherResult(city_name='London', temperature=6.0, condition='Partly cloudy', last_updated='2024-01-06 12:30')
-
-# Print the string representation of the WeatherResult
-print(result)
-# City: London, Temp: 6.0, Condition: Partly cloudy, Last Updated: 2024-01-06 12:30
-
-```
 
 ***
 

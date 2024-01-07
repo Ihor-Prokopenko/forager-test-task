@@ -14,12 +14,14 @@ class WeatherService(WeatherResultManager, ForecastResultManager):
         _api_client (WeatherAPIClient): An instance of the WeatherAPIClient class.
 
     Methods:
-        request_current_weather(self, city_name: str | list[str])
-        request_forecast(self, city_name: str | list[str])
-        save_weather(self, result_obj: WeatherResult | list[WeatherResult])
-        save_forecasts(self, result_obj: ForecastResult | list[ForecastResult])
-        clear_weather(self, city_name: str | list[str])
-        clear_forecast(self, city_name: str | list[str])
+        request_current_weather(city_name): Gets and saves the current weather for one or multiple cities.
+        request_forecast(city_name): Gets and saves the forecast for one or multiple cities.
+        save_weather(weather_obj): Saves weather results in the WeatherService.
+        save_forecasts(forecast_obj): Saves forecast results in the WeatherService.
+        get_weather(city_name): Gets weather results for a specific city or all cities.
+        get_forecast(city_name): Gets forecast results for a specific city or all cities.
+        clear_weather(city_name): Clears weather results for a specific city or all cities.
+        clear_forecast(city_name): Clears forecast results for a specific city or all cities.
     """
 
     def __init__(self, api_client: WeatherAPIClient) -> None:

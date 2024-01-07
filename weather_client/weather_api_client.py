@@ -16,6 +16,10 @@ class WeatherAPIClient(WeatherAPIRequestHandler, DataParserMixin):
         _current_weather_path (str): The path for the current weather endpoint of the Weather API.
         _forecast_path (str): The path for the forecast endpoint of the Weather API.
         _api_key (str): The API key for accessing the Weather API.
+
+    Methods:
+        request_current_weather(self, city_name: str): Request the current weather for a specific city.
+        request_forecast(self, city_name: str): Request the forecast for a specific city.
     """
 
     def request_current_weather(self, city_name: str) -> WeatherResult | None:
