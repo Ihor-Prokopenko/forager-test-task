@@ -63,14 +63,14 @@ class WeatherService(WeatherResultManager, ForecastResultManager):
             for city in city_name:
                 if not isinstance(city, str):
                     raise WeatherServiceExceptionError('Invalid city type. Expected: str')
-                current_weather = client.request_current_weather(city_name=city)
+                current_weather = client.get_current_weather(city_name=city)
                 if not current_weather:
                     continue
                 current_weather_list.append(current_weather)
             return self.save_weather(current_weather_list)
 
         elif isinstance(city_name, str):
-            current_weather = client.request_current_weather(city_name=city_name)
+            current_weather = client.get_current_weather(city_name=city_name)
             if not current_weather:
                 return []
             return self.save_weather(current_weather)
@@ -94,14 +94,14 @@ class WeatherService(WeatherResultManager, ForecastResultManager):
             for city in city_name:
                 if not isinstance(city, str):
                     raise WeatherServiceExceptionError('Invalid city type. Expected: str')
-                forecast = client.request_forecast(city_name=city)
+                forecast = client.get_forecast(city_name=city)
                 if not forecast:
                     continue
                 forecast_list.append(forecast)
             return self.save_forecasts(forecast_list)
 
         elif isinstance(city_name, str):
-            forecast = client.request_forecast(city_name=city_name)
+            forecast = client.get_forecast(city_name=city_name)
             if not forecast:
                 return []
             return self.save_forecasts(forecast)

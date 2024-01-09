@@ -1,7 +1,8 @@
 """Module providing weather-related functionality."""
+from weather_client.weather_data_classes.base_data_class import BaseDataClass
 
 
-class ForecastResult(object):
+class ForecastResult(BaseDataClass):
     """
     Represents the weather forecast result for a city.
 
