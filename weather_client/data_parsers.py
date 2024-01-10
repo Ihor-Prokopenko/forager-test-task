@@ -1,5 +1,8 @@
+"""Module providing weather-related functionality."""
+from typing import Type
+
 from weather_client.exceptions import DataParserError
-from weather_client.weather_data_classes import ForecastResult, WeatherResult, BaseDataClass
+from weather_client.weather_data_classes import BaseDataClass, ForecastResult, WeatherResult
 
 
 class BaseDataParser(object):
@@ -9,37 +12,37 @@ class BaseDataParser(object):
     Attributes:
         data_class (BaseDataClass): The data class for the parser.
     """
-    data_class = BaseDataClass
 
-    def __init__(self, data: dict) -> None:
+    data_class: Type[BaseDataClass] = BaseDataClass
+
+    def __init__(self, data_to_parse: dict) -> None:
         """Initialize the BaseDataParser."""
-        self.data = data
+        self.data_to_parse = data_to_parse
 
-    def _parse_data(self, data: dict) -> dict:
+    def _parse_data(self, data_to_parse: dict) -> dict:
         """
         Parse the data.
 
         Args:
-            data (dict): The data to parse.
+            data_to_parse (dict): The data to parse.
 
         Returns:
             dict: The parsed data.
         """
-        return data
+        return data_to_parse
 
-    def data_to_object(self) -> object:
+    def data_to_object(self) -> BaseDataClass:
         """
         Convert the data to an object.
 
         Returns:
-            object: The object.
+            BaseDataClass: The object.
         """
         try:
-            formatted_data = self._parse_data(self.data)
-            obj = self.data_class(**formatted_data)
-        except TypeError as e:
-            raise DataParserError(str(e))
-        return obj
+            formatted_data = self._parse_data(self.data_to_parse)
+        except TypeError as error:
+            raise DataParserError(str(error))
+        return self.data_class(**formatted_data)
 
 
 class WeatherDataParser(BaseDataParser):
@@ -49,30 +52,30 @@ class WeatherDataParser(BaseDataParser):
     Attributes:
         data_class (BaseDataClass): The data class for the parser.
     """
-    data_class: BaseDataClass = WeatherResult
 
-    def _parse_data(self, data: dict) -> dict:
+    data_class: Type[BaseDataClass] = WeatherResult
+
+    def _parse_data(self, data_to_parse: dict) -> dict:
         """
         Parse the data.
 
         Args:
-            data (dict): The data to parse.
+            data_to_parse (dict): The data to parse.
 
         Returns:
             dict: The parsed data.
         """
-        if not isinstance(data, dict):
-            raise TypeError('Data must be a dictionary. Got {0}'.format(type(data)))
-        city_name = data.get('location', {}).get('name', '')
+        if not isinstance(data_to_parse, dict):
+            raise TypeError('Data must be a dictionary. Got {0}'.format(type(data_to_parse)))
+        city_name = data_to_parse.get('location', {}).get('name', '')
         if not city_name:
             raise DataParserError('City name not found in data')
-        formatted_data = {
+        return {
             'city_name': city_name,
-            'temperature': data.get('current', {}).get('temp_c', 0),
-            'condition': data.get('current', {}).get('condition', {}).get('text', ''),
-            'last_updated': data.get('current', {}).get('last_updated', ''),
+            'temperature': data_to_parse.get('current', {}).get('temp_c', 0),
+            'condition': data_to_parse.get('current', {}).get('condition', {}).get('text', ''),
+            'last_updated': data_to_parse.get('current', {}).get('last_updated', ''),
         }
-        return formatted_data
 
 
 class ForecastDataParser(BaseDataParser):
@@ -82,30 +85,31 @@ class ForecastDataParser(BaseDataParser):
     Attributes:
         data_class (BaseDataClass): The data class for the parser.
     """
-    data_class: BaseDataClass = ForecastResult
 
-    def _parse_data(self, data: dict) -> dict:
+    data_class: Type[BaseDataClass] = ForecastResult
+
+    def _parse_data(self, data_to_parse: dict) -> dict:
         """
         Parse the data.
 
         Args:
-            data (dict): The data to parse.
+            data_to_parse (dict): The data to parse.
 
         Returns:
             dict: The parsed data.
         """
-        if not isinstance(data, dict):
-            raise ValueError('Data must be a dictionary. Got {0}'.format(type(data)))
-        if not data.get('location', {}).get('name'):
+        if not isinstance(data_to_parse, dict):
+            raise ValueError('Data must be a dictionary. Got {0}'.format(type(data_to_parse)))
+        if not data_to_parse.get('location', {}).get('name'):
             raise DataParserError('City name not found in data')
 
-        forecast_full_data = data.get('forecast', {})
+        forecast_full_data = data_to_parse.get('forecast', {})
         forecastday = forecast_full_data.get('forecastday', [{}])[0]
         day_data = forecastday.get('day', {})
         day_condition = day_data.get('condition', {})
 
-        formatted_data = {
-            'city_name': data.get('location', {}).get('name', ''),
+        return {
+            'city_name': data_to_parse.get('location', {}).get('name', ''),
             'avg_temp': day_data.get('avgtemp_c', 0),
             'min_temp': day_data.get('mintemp_c', 0),
             'max_temp': day_data.get('maxtemp_c', 0),
@@ -114,4 +118,3 @@ class ForecastDataParser(BaseDataParser):
             'chance_of_snow': day_data.get('daily_chance_of_snow', 0),
             'date': forecastday.get('date', ''),
         }
-        return formatted_data

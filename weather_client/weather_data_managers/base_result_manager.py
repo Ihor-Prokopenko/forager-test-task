@@ -1,41 +1,47 @@
+"""Module providing weather-related functionality."""
+from typing import Generic, Type, TypeVar
+
 from weather_client.exceptions import WeatherAPIDataManagerError
 from weather_client.weather_data_classes import BaseDataClass
 
+T = TypeVar('T', bound=BaseDataClass)
 
-class BaseDataManager(object):
-    """Manages weather results."""
-    data_class = BaseDataClass
+
+class BaseDataManager(Generic[T]):
+    """Manages weather API results."""
+
+    data_class: Type[T]
     objects_storage: list = []
 
     def __init__(self, filter_field: str) -> None:
         """Initialize the BaseDataManager."""
         self.filter_field = filter_field
 
-    def _save_or_update_object(self, obj: data_class) -> data_class:
+    def _save_or_update_object(self, data_obj: T) -> T:
         """
         Save or update the object.
 
         Args:
-            obj (data_class): The object to save or update.
+            data_obj (T): The object to save or update.
 
         Returns:
-            data_class: The saved or updated object.
+            T: The saved or updated object.
         """
-        if not isinstance(obj, self.data_class):
-            raise TypeError('Invalid result type. Expected: {}, got: {}'.format(self.data_class, type(obj)))
+        if not isinstance(data_obj, self.data_class):
+            raise TypeError('Invalid result type. Expected:{0}, got:{1}'.format(self.data_class, type(data_obj)))
 
         filter_field = self.filter_field
-        filter_value = getattr(obj, self.filter_field)
+        filter_value = getattr(data_obj, self.filter_field)
         if not isinstance(filter_value, str):
-            raise TypeError('Invalid filter value type. Expected: str, got: {}'.format(type(filter_value)))
+            raise TypeError('Invalid filter value type. Expected: str, got: {0}'.format(type(filter_value)))
 
         for existing_obj in self.objects_storage:
             if getattr(existing_obj, filter_field).lower() == filter_value.lower():
-                for field in vars(self.data_class):
-                    setattr(existing_obj, field, getattr(obj, field))
+                for field in self.data_class.__dict__:
+                    setattr(existing_obj, field, getattr(data_obj, field))
                 return existing_obj
-        self.objects_storage.append(obj)
-        return obj
+        self.objects_storage.append(data_obj)
+        return data_obj
 
     def _delete_stored_objects(self, filter_value: str = '') -> int:
         """
@@ -50,21 +56,23 @@ class BaseDataManager(object):
         filter_field = self.filter_field
 
         if not isinstance(filter_value, str):
-            raise TypeError('Invalid filter value type. Expected: str, got: {}'.format(type(filter_value)))
+            raise TypeError('Invalid filter value type. Expected: str, got: {0}'.format(type(filter_value)))
         if not filter_value:
             objects_count = self.count()
             self.objects_storage = []
             return objects_count
 
-        objects_to_delete_indices = [index for index, obj in enumerate(self.objects_storage) if
-                                     getattr(obj, filter_field).lower() == filter_value.lower()]
+        objects_to_delete_indices = [
+            index for index, data_obj in enumerate(self.objects_storage) if
+            getattr(data_obj, filter_field).lower() == filter_value.lower()
+        ]
 
         for index in sorted(objects_to_delete_indices, reverse=True):
             del self.objects_storage[index]
 
         return len(objects_to_delete_indices)
 
-    def _get_object(self, filter_value: str) -> data_class:
+    def _get_object(self, filter_value: str) -> T | None:
         """
         Get an object.
 
@@ -76,28 +84,29 @@ class BaseDataManager(object):
         """
         if not isinstance(filter_value, str):
             raise WeatherAPIDataManagerError(
-                'Invalid filter value type. Expected: str, got: {}'.format(type(filter_value)),
+                'Invalid filter value type. Expected: str, got: {0}'.format(type(filter_value)),
             )
-        for obj in self.objects_storage:
-            if getattr(obj, self.filter_field).lower() == filter_value.lower():
-                return obj
+        for data_obj in self.objects_storage:
+            if getattr(data_obj, self.filter_field).lower() == filter_value.lower():
+                return data_obj
+        return None
 
-    def save(self, obj: data_class) -> data_class | None:
+    def save(self, data_obj: T) -> T | None:
         """
         Save a result.
 
         Args:
-            obj: The result to save.
+            data_obj: The result to save.
 
         Returns:
             The saved result.
         """
-        if not obj:
+        if not data_obj:
             return None
         try:
-            saved_obj = self._save_or_update_object(obj)
-        except TypeError as e:
-            raise WeatherAPIDataManagerError(str(e))
+            saved_obj = self._save_or_update_object(data_obj)
+        except TypeError as error:
+            raise WeatherAPIDataManagerError(str(error))
         return saved_obj
 
     def count(self) -> int:

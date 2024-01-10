@@ -5,12 +5,11 @@ from weather_client.weather_data_managers.base_result_manager import BaseDataMan
 
 class ForecastResultManager(BaseDataManager):
     """Manages weather forecast results."""
+
     data_class = ForecastResult
 
     def __init__(self) -> None:
-        """
-        Initialize the WeatherResultManager.
-        """
+        """Initialize the WeatherResultManager."""
         super().__init__(filter_field='city_name')
         self.objects_storage = []
 
@@ -26,7 +25,8 @@ class ForecastResultManager(BaseDataManager):
         """
         if not city_name:
             return self.objects_storage
-        return self._get_object(city_name)
+        forecast_obj = self._get_object(city_name)
+        return forecast_obj if forecast_obj else []
 
     def clear(self, city_name: str = '') -> int:
         """

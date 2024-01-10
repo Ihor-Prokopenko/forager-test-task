@@ -27,4 +27,3 @@ class DataParserError(Exception):
 
 class WeatherAPIDataManagerError(Exception):
     """Exception class for Weather API Data Manager-related errors."""
-

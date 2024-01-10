@@ -12,6 +12,7 @@ class WeatherResult(BaseDataClass):
         condition (str): The weather condition description.
         last_updated (str): The timestamp of the last update.
     """
+
     city_name: str
     temperature: int | float
     condition: str
