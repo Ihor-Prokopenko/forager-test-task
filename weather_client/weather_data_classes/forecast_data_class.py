@@ -17,6 +17,15 @@ class ForecastResult(BaseDataClass):
         date (str): The date of the forecast.
     """
 
+    city_name: str
+    avg_temp: int | float
+    min_temp: int | float
+    max_temp: int | float
+    condition: str
+    chance_of_rain: int | float
+    chance_of_snow: int | float
+    date: str
+
     def __init__(
             self,
             city_name: str,
@@ -42,6 +51,7 @@ class ForecastResult(BaseDataClass):
         self.chance_of_rain = chance_of_rain
         self.chance_of_snow = chance_of_snow
         self.date = date
+        super().__init__(**self.__dict__)
 
     def __str__(self) -> str:
         """Generate a string representation of the WeatherResult."""

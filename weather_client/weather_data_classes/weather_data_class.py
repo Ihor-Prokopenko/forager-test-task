@@ -12,6 +12,10 @@ class WeatherResult(BaseDataClass):
         condition (str): The weather condition description.
         last_updated (str): The timestamp of the last update.
     """
+    city_name: str
+    temperature: int | float
+    condition: str
+    last_updated: str
 
     def __init__(self, city_name: str, temperature: int | float, condition: str, last_updated: str) -> None:
         """
@@ -23,10 +27,11 @@ class WeatherResult(BaseDataClass):
             condition (str): The weather condition description.
             last_updated (str): The timestamp of the last update.
         """
-        self.city_name = city_name
-        self.temperature = temperature
-        self.condition = condition
-        self.last_updated = last_updated
+        self.city_name: str = city_name
+        self.temperature: int | float = temperature
+        self.condition: str = condition
+        self.last_updated: str = last_updated
+        super().__init__(**self.__dict__)
 
     def __str__(self) -> str:
         """Generate a string representation of the WeatherResult."""

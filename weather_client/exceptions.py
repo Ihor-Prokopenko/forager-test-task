@@ -5,26 +5,26 @@ class WeatherServiceExceptionError(Exception):
     """Exception class for Weather Service-related errors."""
 
 
-class WeatherAPIExceptionError(Exception):
+class WeatherAPIRequestError(Exception):
     """Exception class for Weather API-related errors."""
 
 
-class WeatherAPIRequestError(Exception):
-    pass
-
-
 class WeatherAPIEndpointError(Exception):
-    pass
+    """Exception class for Weather API-related errors."""
 
 
 class WeatherAPIError(Exception):
-    pass
+    """Exception class for Weather API-related errors."""
 
 
 class WeatherAPIClientError(Exception):
-    pass
+    """Exception class for Weather API-related errors."""
 
 
 class DataParserError(Exception):
-    pass
+    """Exception class for Data Parser-related errors."""
+
+
+class WeatherAPIDataManagerError(Exception):
+    """Exception class for Weather API Data Manager-related errors."""
 
