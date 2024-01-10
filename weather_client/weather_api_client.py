@@ -1,6 +1,4 @@
 """Module providing weather-related functionality."""
-from typing import Type
-
 from weather_client.exceptions import WeatherAPIClientError, WeatherAPIEndpointError
 from weather_client.weather_api_endpoints import ForecastEndpoint, WeatherEndpoint
 from weather_client.weather_data_classes import ForecastResult, WeatherResult

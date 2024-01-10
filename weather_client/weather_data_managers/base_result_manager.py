@@ -111,7 +111,7 @@ class BaseDataManager(Generic[T]):
 
     def count(self) -> int:
         """
-        Get the count of stored weather results.
+        Get the count of stored data objects results.
 
         Returns:
             int: The count of stored weather results.
