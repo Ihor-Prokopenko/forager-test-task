@@ -1,6 +1,6 @@
 """Module providing weather-related functionality."""
-from weather_client.weather_data_managers.forecast_result_manager import ForecastResultManager
-from weather_client.weather_data_managers.weather_result_manager import WeatherResultManager
+from weather_client.weather_data_managers.forecast_data_manager import ForecastResultManager
+from weather_client.weather_data_managers.weather_data_manager import WeatherResultManager
 
 __all__ = [
     'WeatherResultManager',

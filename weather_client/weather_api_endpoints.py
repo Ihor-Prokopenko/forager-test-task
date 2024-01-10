@@ -26,7 +26,7 @@ class BaseWeatherAPIEndpoint(BaseWeatherAPIRequest):
         }
         super().__init__()
 
-    def _get_data(self, query_params: Optional[dict] = None) -> Any:
+    def _request_data(self, query_params: Optional[dict] = None) -> Any:
         """
         Get data from the API.
 
@@ -73,7 +73,7 @@ class WeatherEndpoint(BaseWeatherAPIEndpoint):
         query_params = {
             'q': city_name,
         }
-        return self._get_data(query_params)
+        return self._request_data(query_params)
 
 
 class ForecastEndpoint(BaseWeatherAPIEndpoint):
@@ -105,4 +105,4 @@ class ForecastEndpoint(BaseWeatherAPIEndpoint):
         query_params = {
             'q': city_name,
         }
-        return self._get_data(query_params)
+        return self._request_data(query_params)

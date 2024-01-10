@@ -41,7 +41,7 @@ api_key = "your_weather_api_key"
 client = WeatherAPIClient(api_key)
 
 # >>>> request weather by city name via CLIENT <<<
-weather_in_london = client.get_current_weather('London')
+weather_in_london = client.weather.get_current_weather('London')
 print(weather_in_london)
 # City: London, Temp: 2.0, Condition: Clear, Last Updated: 2024-01-09 23:30
 print(weather_in_london.condition)
@@ -50,7 +50,7 @@ print(weather_in_london.temperature)
 # 4.0
 
 # >>>> request weather forecast by city name via CLIENT <<<<
-forecast_for_london = client.get_forecast('London')
+forecast_for_london = client.forecast.get_forecast('London')
 print(forecast_for_london)
 # City: London, Avg_temp: 2.0, Condition: Partly cloudy, Date: 2024-01-09
 print(forecast_for_london.avg_temp)
@@ -72,22 +72,16 @@ Attributes:
 - `weather_data`: WeatherResultManager()
 - `forecast_data`: ForecastResultManager()
 
-Public methods:
+Managers methods:
 
- - `get_and_save_weather`: Get and save the current weather for the specified city.
- - `get_and_save_forecast`: Get and save the forecast for the specified city.
+  - `client.weather_data.request_and_save_weather(city_name: str)`: Get and save the current weather for the specified city.
+  - `client.forecast_data.request_and_save_forecast(city_name: str)`: Get and save the forecast for the specified city.
 
-Data manager methods:
-
-- Managers:
-  - `client.weather_data`
-  - `client.forecast_data`
-
-    - `data_manager.save(filter_field_value: str)`: Store result.
-    - `data_manager.get(filter_field_value:str)`: Get the specified object from the storage by specific field value.
-    - `data_manager.clear(filter_field_value: str)`: Delete specified or all data objects from storage.
-    - `data_manager.count()`: Get the count of stored data objects results.
-    - `data_manager.get_as_str()`: Get the stored object as a string.
+  - `data_manager.save(filter_field_value: str)`: Store result.
+  - `data_manager.get(filter_field_value:str)`: Get the specified object from the storage by specific field value.
+  - `data_manager.clear(filter_field_value: str)`: Delete specified or all data objects from storage.
+  - `data_manager.count()`: Get the count of stored data objects results.
+  - `data_manager.get_as_str()`: Get the stored object as a string.
 
 
 ## Example using WeatherService:
@@ -98,8 +92,8 @@ api_key = "your_weather_api_key"
 
 # >>>> create an instance of the CLIENT <<<<
 client = WeatherAPIClient(api_key)
-weather_in_london = client.get_current_weather('London')
-forecast_for_london = client.get_forecast('London')
+weather_in_london = client.weather.get_current_weather('London')
+forecast_for_london = client.forecast.get_forecast('London')
 
 # >>>> create an instance of the SERVICE <<<<
 service = WeatherService(client)
@@ -116,8 +110,8 @@ print(saved_weather)
 
 # >>>> request and save weather and forecast by city name via SERVICE <<<<
 city = 'Paris'
-service.get_and_save_forecast(city)
-service.get_and_save_weather(city)
+service.forecast_data.request_and_save_forecast(city)
+service.weather_data.request_and_save_weather(city)
 
 print(service.forecast_data.get())
 # [object.ForecastResult(city_name=London, date=2024-01-09), object.ForecastResult(city_name=Paris, date=2024-01-10)]
